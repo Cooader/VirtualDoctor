@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Doctor</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #FFDF37;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .robot-ears {
+            background: #D7ECF7;
+            border: 10px solid #000;
+            border-radius: 44px;
+            box-sizing: border-box;
+            height: 100px;
+            position: relative;
+            top: 200px;
+            width: 490px;
+        }
+        .robot-head {
+            background: #fff;
+            border-radius: 120px;
+            border: 10px solid #000;
+            box-sizing: border-box;
+            position: relative;
+            width: 400px;
+            height: 320px;
+        }
+        .pulse {
+            background: red;
+            border-radius: 500px;
+            height: 80px;
+            width: 80px;
+            position: absolute;
+            top: -125px;
+            left: calc(50% - 40px);
+            animation: pulse 1s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            from {
+                background: #663399;
+                transform: scale(1);
+                opacity: 1;
+            }
+            to {
+                background: #fff;
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+        .robot-antenna {
+            background: #000;
+            height: 50px;
+            width: 14px;
+            position: absolute;
+            top: -50px;
+            left: calc(50% - 7px);
+        }
+        .robot-antenna:before {
+            background: #B88EF4;
+            border: 10px solid #000;
+            border-radius: 100px;
+            box-sizing: border-box;
+            content: '';
+            display: block;
+            position: relative;
+            top: -75px;
+            left: -34.5px;
+            width: 80px;
+            height: 80px;
+        }
+        .robot-face {
+            box-sizing: border-box;
+            background: #94D3F7;
+            border-radius: 60px;
+            border: 8px solid #000;
+            position: absolute;
+            top: 50px;
+            left: calc(50% - 140px);
+            width: 280px;
+            height: 200px;
+        }
+        .robot-eye-left,
+        .robot-eye-right {
+            background: #000;
+            border-radius: 100px;
+            position: absolute;
+            top: 50px;
+            width: 40px;
+            animation: blink 4s infinite ease-in-out;
+        }
+        .robot-eye-left {
+            left: 56px;
+        }
+        .robot-eye-right {
+            right: 56px;
+        }
+        @keyframes blink {
+            0%, 12%, 100% {
+                height: 40px;
+                top: 50px;
+            }
+            5%, 7% {
+                height: 7px;
+                top: 71px;
+            }
+        }
+        .robot-mouth {
+            width: 80px;
+            position: absolute;
+            left: 92px;
+            top: 30px;
+        }
+        /* Add styles for eyebrows and pupils */
+        #left-brow, #right-brow {
+            position: absolute;
+            width: 40px;
+            height: 10px;
+            background-color: black;
+        }
+
+        .pupil {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: black;
+            border-radius: 50%;
+            top: 60px;
+        }
+
+        /* Style for the Start Introduction button */
+        .start-button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            position: relative;
+            bottom: 20px;
+            left: 100px;
+            top: 50px;
+
+            transform: translateX(-50%);
+        }
+
+        .start-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="robot-ears"></div>
+        <div class="robot-head">
+            <div class="pulse"></div>
+            <div class="robot-antenna"></div>
+            <div class="robot-face">
+                <div class="robot-eye-left"></div>
+                <div class="robot-eye-right"></div>
+                <svg class="robot-mouth" width="100%" height="100%" viewBox="0 0 170 63" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+                    <path d="M10,10c11.985,25.848 41.76,42.886 74.947,42.886c33.188,0 62.962,-17.038 74.947,-42.886c-11.985,25.848 -41.759,42.886 -74.947,42.886c-33.187,0 -62.962,-17.038 -74.947,-42.886Z" style="stroke:#000;stroke-width:20px;"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Introduction Button -->
+    <button class="start-button" id="start-intro-btn">Start Introduction</button>
+
+    <script>
+
+        const colors = ["#F7D716", "#FF5733", "#FFC300"];
+        const face = document.querySelector(".robot-face");
+
+        setInterval(() => {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            face.style.backgroundColor = randomColor;
+            }, 1000);
+
+        // Check for SpeechRecognition API
+        const recognition = (() => {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Speech recognition is not supported on your device or browser.");
+                return null;
+            }
+            return new SpeechRecognition();
+        })();
+
+        if (recognition) {
+            const mouth = document.querySelector('.robot-mouth');
+            recognition.lang = 'en-US';
+            recognition.continuous = true;
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                console.log("Voice recognition started. Speak now.");
+                mouth.style.animationPlayState = 'paused'; // Pause mouth animation while listening
+            };
+
+            recognition.onresult = (event) => {
+                const command = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+                console.log("You said: " + command);
+                handleVoiceCommand(command);
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error: " + event.error);
+            };
+
+            recognition.onend = () => {
+                console.log("Voice recognition ended. Restarting...");
+                recognition.start();
+            };
+
+            
+            const commands = {
+                intro: () => startIntro(),
+                happy: () => changeExpression('happy'),
+                sad: () => changeExpression('sad'),
+                angry: () => changeExpression('angry'),
+                surprised: () => changeExpression('surprised'),
+                "open schedule": () => openPage('schedule.html'),
+                temperature: () => openPage('temperature.html'),
+                "blood pressure": () => openPage('bloodpressure.html'),
+                oxygen: () => openPage('oxygen.html'),
+                back: () => openPage('copy2.html.html'),
+                headeche: () => headeche(),
+                bodyPain: ()=> bodyPain(),
+                stomachpain:()=> stomachPain(),
+                cough:()=> cough(),
+                cold:()=> cold(),
+                fever:()=> fever(),
+                vomiting: () => vomiting(),
+            };
+
+            // Function to handle voice commands
+            function handleVoiceCommand(command) {
+                const matchedCommand = Object.keys(commands).find(key =>
+                    new RegExp(`\\b${key}\\b`, 'i').test(command) // Correctly use template literal
+                );
+                if (matchedCommand) {
+                    commands[matchedCommand]();
+                } else {
+                    playResponse("Please give a valid command.");
+                }
+            }
+
+            // Function to change the robot's expression based on the command
+            function changeExpression(expression) {
+                const leftBrow = document.getElementById('left-brow');
+                const rightBrow = document.getElementById('right-brow');
+                const pupils = document.querySelectorAll('.pupil');
+
+                if (!leftBrow || !rightBrow || pupils.length === 0) {
+                    console.warn("Missing elements for facial expressions.");
+                    return;
+                }
+
+                const expressions = {
+                    happy: () => {
+                        leftBrow.style.transform = 'translateY(-10px)';
+                        rightBrow.style.transform = 'translateY(-10px)';
+                        pupils.forEach(pupil => pupil.style.transform = 'translateY(-5px) scale(1.2)');
+                    },
+                    sad: () => {
+                        leftBrow.style.transform = 'translateY(10px)';
+                        rightBrow.style.transform = 'translateY(10px)';
+                        pupils.forEach(pupil => pupil.style.transform = 'translateY(5px) scale(0.8)');
+                    },
+                    angry: () => {
+                        leftBrow.style.transform = 'translateY(10px) rotate(-35deg)';
+                        rightBrow.style.transform = 'translateY(10px) rotate(35deg)';
+                        pupils.forEach(pupil => pupil.style.transform = 'scale(1)');
+                    },
+                    surprised: () => {
+                        leftBrow.style.transform = 'translateY(-30px)';
+                        rightBrow.style.transform = 'translateY(-30px)';
+                        pupils.forEach(pupil => pupil.style.transform = 'scale(1.5)');
+                    },
+                };
+
+                if (expressions[expression]) {
+                    expressions[expression]();
+                } else {
+                    console.log("Unknown expression:", expression);
+                }
+            }
+
+            // Function to start intro
+            function startIntro() {
+                const introText = "Hello, I’m Doctor. Robo, your virtual doctor robot, here to provide personalized medical advice, and monitor your welness.";
+                playResponse(introText);
+            }
+            function headeche() {
+                const medicine = "Take Paracetamol 500mg, drink plenty of water, and rest in a quiet place."
+                playResponse(medicine);
+            }
+            function bodyPain() {
+                const advice = "Take Ibuprofen 400mg after food, apply a hot or cold compress, and rest your muscles.";
+                playResponse(advice);
+            }
+            function stomachPain() {
+                const text = "Take antacids, avoid spicy food, and stay hydrated. Consult a doctor if severe.";
+                playResponse(text);
+                changeExpression("sad");
+            }
+            function vomiting() {
+                const text = "Stay hydrated, take ORS solution, and eat small, bland meals. Consult a doctor if it persists.";
+                playResponse(text);
+                changeExpression("surprised");
+            }
+            function cough() {
+                const text = "Take warm fluids, honey, and over-the-counter cough medicine. Rest well.";
+                playResponse(text);
+                changeExpression("angry");
+            }
+            function cold() {
+                const text = "Stay warm, drink hot fluids, and rest. Consult a doctor if needed.";
+                playResponse(text);
+                changeExpression("happy");
+            }
+            function fever() {
+                const text = "Take Crocin 500mg, stay hydrated, and monitor your body temperature regularly.";
+                playResponse(text);
+                changeExpression("surprised");
+            }
+
+            // Function to open a new page
+            function openPage(page) {
+                window.location.href = page;
+            }
+
+            // Function to play a speech response
+            function playResponse(responseText) {
+                const utterance = new SpeechSynthesisUtterance(responseText);
+
+                // Start the mouth animation when speaking
+                mouth.style.animationPlayState = 'running';
+
+                speechSynthesis.speak(utterance);
+
+                utterance.onend = () => {
+                    // Pause mouth animation when speaking ends
+                    mouth.style.animationPlayState = 'paused';
+                };
+            }
+
+            // Start recognition on page load
+            recognition.start();
+        }
+
+        // Add event listener to the start intro button
+        document.getElementById('start-intro-btn').addEventListener('click', startIntro);
+    </script>
+</body>
+</html>
